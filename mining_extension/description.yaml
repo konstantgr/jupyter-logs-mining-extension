@@ -1,0 +1,14 @@
+Type: Jupyter Notebook Extension
+Compatibility: 3.x, 4.x, 5.x, 6.x
+Name: Logs mining extension
+Main: main.js
+Link: README.md
+Description: |
+  Hello there
+Parameters:
+- name: url
+  description: Remote Server URL
+  input_type: text
+  default: 8.8.8.8
+
+
