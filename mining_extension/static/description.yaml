@@ -4,11 +4,13 @@ Name: Logs mining extension
 Main: main.js
 Link: README.md
 Description: |
-  Hello there
+  Description
 Parameters:
+- name: agreement
+  description: I am agree to post my logs to the remote server
+  input_type: checkbox
+  default: false
 - name: url
   description: Remote Server URL
   input_type: text
-  default: 8.8.8.8
-
-
+  default: 0.0.0.0

@@ -1,9 +1,9 @@
 ### Basic environment
 In order to run extension on your local machine, you will need: `...`
 
-If you don't have [Jupyter Notebook](http://jupyter.org/) installed, you can install it by running:
 ```bash
-python3 -m pip install jupyter
+cd jupyter-logs-mining-extension
+poetry init 
 ```
 
 ### Install mining extension

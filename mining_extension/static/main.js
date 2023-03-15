@@ -1,19 +1,20 @@
+// 'url' : 'http://3.249.245.244:9999/',
+
 define([
     'jquery',
     'base/js/namespace',
     'base/js/events',
-    './credentials'
-], function ($, Jupyter, events, credentials) {
+], function ($, Jupyter, events) {
     "use strict";
 
-    var params = {
-        url: credentials.url,
+    const params = {
+        url: "0.0.0.0",
+        agreement: false
     };
 
-    // updates default params with any specified in the server's config
-    var update_params = function () {
-        var config = Jupyter.notebook.config;
-        for (var key in params) {
+    const update_params = function () {
+        const config = Jupyter.notebook.config;
+        for (const key in params) {
             if (config.data.hasOwnProperty(key)) {
                 params[key] = config.data[key];
             }
@@ -43,15 +44,16 @@ define([
     }
 
     function saveLogs(time, sessionId, kernelId, notebookName, event, cell, cellNumber) {
-        console.log(cell, cell === undefined)
+        let cellIndex;
+        let cellSource;
         if (cell === undefined) {
-            var cellSource = "";
-            var cellIndex = "";
+            cellSource = "";
+            cellIndex = "";
         } else {
-            var cellSource = cell.get_text();
-            var cellIndex = cell.cell_id;
+            cellSource = cell.get_text();
+            cellIndex = cell.cell_id;
         }
-        var logs = {
+        const logs = {
             "time": time,
             "kernel_id": kernelId,
             "notebook_name": notebookName,
@@ -88,8 +90,8 @@ define([
     }
 
     function DeleteUpAndDownButtons() {
-        var btn_up = document.querySelector('.btn.btn-default[title="move selected cells up"]');
-        var btn_down = document.querySelector('.btn.btn-default[title="move selected cells down"]');
+        const btn_up = document.querySelector('.btn.btn-default[title="move selected cells up"]');
+        const btn_down = document.querySelector('.btn.btn-default[title="move selected cells down"]');
 
         if (btn_up) {
             btn_up.parentNode.removeChild(btn_up);
@@ -99,18 +101,33 @@ define([
         }
     }
 
+    function AddText() {
+        Jupyter.toolbar.add_buttons_group([
+            {
+                'label': 'Remote server ' + params.url,
+                'icon': 'fa-font',
+                'callback': function() {
+                    const input = prompt('Enter text:', params.url);
+                    // Do something with the entered text
+                }
+            }
+        ]);
+    }
+
     function loadExtension() {
         if (Jupyter.notebook) {
             update_params();
-            registerEvents();
-            DeleteUpAndDownButtons();
-
+            if (params.agreement) {
+                registerEvents();
+                DeleteUpAndDownButtons();
+            }
         } else {
             events.on('notebook_loaded.Notebook', function () {
                 update_params();
-                registerEvents();
-                DeleteUpAndDownButtons();
-
+                if (params.agreement) {
+                    registerEvents();
+                    DeleteUpAndDownButtons();
+                }
             });
         }
     }
