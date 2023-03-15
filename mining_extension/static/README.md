@@ -1,2 +1,1 @@
-README Description
-Description Description Description Description
+README Description of this extension
