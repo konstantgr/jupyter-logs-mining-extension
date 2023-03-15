@@ -1,18 +1,20 @@
-### Basic environment
-In order to run extension on your local machine, you will need: `...`
+# Jupyter Mining Extension
+Extension
 
+## Description:
+Description
+
+## Install
 ```bash
-cd jupyter-logs-mining-extension
-poetry init 
+pip install git+https://github.com/konstantgr/jupyter-logs-mining-extension.git@python_extension
+jupyter nbextension install --py cellfolding --user
+jupyter nbextension enable --py cellfolding --user 
 ```
 
-### Install mining extension
-#### Clone repo
-> git clone https://github.com/.../....git
-
-#### Install jupyter extension
-```bash
-cd jupyter-logs-mining-extension
-(sudo) jupyter nbextension install mining_extension
-jupyter contrib nbextension install --user
+## Install Jupyter Contrib (Optional)
+```
+pip install jupyter_contrib_nbextensions
+pip install jupyter_nbextensions_configurator
+jupyter contrib nbextension install --user 
+jupyter nbextensions_configurator enable --user
 ```
