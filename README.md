@@ -7,8 +7,8 @@ Description
 ## Install
 ```bash
 pip install git+https://github.com/konstantgr/jupyter-logs-mining-extension.git@python_extension
-jupyter nbextension install --py cellfolding --user
-jupyter nbextension enable --py cellfolding --user 
+jupyter nbextension install --py mining_extension --user
+jupyter nbextension enable --py mining_extension --user 
 ```
 
 ## Install Jupyter Contrib (Optional)
