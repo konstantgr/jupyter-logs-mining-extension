@@ -15,6 +15,9 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 
+[tool.poetry.plugins."poetry-build"]
+include = ["static/**"]
+
 [tool.poetry.dependencies]
 python = "^3.7"
 notebook = "6.1.5"
