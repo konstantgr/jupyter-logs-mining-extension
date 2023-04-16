@@ -18,12 +18,10 @@ jupyter-contrib-nbextensions = "^0.7.0"
 jupyter = "^1.0.0"
 
 [tool.poetry.plugins."poetry-dynamic-plugins"]
-include = ["poetry_include:*.toml"]
+include = "poetry_include:*.toml"
 
 [tool.poetry.plugins."poetry-build"]
-# By default, Poetry only includes Python files in packages, so we need to
-# explicitly include our static directory
-include = ["static/**"]
+include = "static/**"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
