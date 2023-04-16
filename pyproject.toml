@@ -1,3 +1,6 @@
+[project]
+name = "jupyter-mining-extension"
+
 [build-system]
 requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
