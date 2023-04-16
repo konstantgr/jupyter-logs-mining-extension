@@ -1,0 +1,3 @@
+recursive-include mining_extension/static *.js
+recursive-include mining_extension/static *.md
+recursive-include mining_extension/static *.yaml
