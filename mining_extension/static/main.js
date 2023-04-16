@@ -138,19 +138,17 @@ define([
         if (params.agreement) {
             DeleteUpAndDownButtons();
 
-            Jupyter.notebook.events.one('kernel_ready.Kernel', function () {
-                Jupyter.notebook.load_notebook().then(saveCells);
-            });
-
             if (Jupyter.notebook) {
-                if (params.agreement) {
-                    registerEvents();
-                }
+                Jupyter.notebook.events.one('kernel_ready.Kernel', function () {
+                    Jupyter.notebook.load_notebook().then(saveCells);
+                });
+                registerEvents();
             } else {
                 events.on('notebook_loaded.Notebook', function () {
-                    if (params.agreement) {
-                        registerEvents();
-                    }
+                    Jupyter.notebook.events.one('kernel_ready.Kernel', function () {
+                        Jupyter.notebook.load_notebook().then(saveCells);
+                    });
+                    registerEvents();
                 });
             }
         }
