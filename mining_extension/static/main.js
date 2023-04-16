@@ -113,7 +113,7 @@ define([
         for (let i = 0; i < cells.length; i++) {
             const cell = cells[i];
             const cellData = cell.source.toJSON();
-            delete cellData.output;
+            delete cellData.outputs;
             notebook.push(cellData);
         }
 
