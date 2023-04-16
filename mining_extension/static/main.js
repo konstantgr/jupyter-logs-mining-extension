@@ -12,6 +12,16 @@ define([
         agreement: false
     };
 
+    const tracked_events = [
+        'create.Cell',
+        'delete.Cell',
+        'execute.CodeCell',
+        'rendered.MarkdownCell',
+        'notebook_renamed.Notebook',
+        'kernel_interrupting.Kernel',
+        'kernel_restarting.Kernel',
+    ];
+
     const update_params = function () {
         const config = Jupyter.notebook.config;
         for (const key in params) {
@@ -72,15 +82,6 @@ define([
     }
 
     function registerEvents() {
-        const tracked_events = [
-            'create.Cell',
-            'delete.Cell',
-            'execute.CodeCell',
-            'rendered.MarkdownCell',
-            'notebook_renamed.Notebook',
-            'kernel_interrupting.Kernel',
-            'kernel_restarting.Kernel',
-        ];
 
         events.on(tracked_events.join(' '), function (evt, data) {
             const kernelId = Jupyter.notebook.kernel.id;
@@ -103,19 +104,6 @@ define([
         if (btn_down) {
             btn_down.parentNode.removeChild(btn_down);
         }
-    }
-
-    function AddText() {
-        Jupyter.toolbar.add_buttons_group([
-            {
-                'label': 'Remote server ' + params.url,
-                'icon': 'fa-font',
-                'callback': function () {
-                    const input = prompt('Enter text:', params.url);
-                    // Do something with the entered text
-                }
-            }
-        ]);
     }
 
     function saveCells() {
@@ -155,13 +143,7 @@ define([
                 Jupyter.notebook.events.one('kernel_ready.Kernel', function () {
                     saveCells();
                 });
-
                 registerEvents();
-            } else {
-                events.on('notebook_loaded.Notebook', function () {
-                    saveCells()
-                    registerEvents();
-                });
             }
         }
     }

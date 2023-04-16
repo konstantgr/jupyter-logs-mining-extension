@@ -1,3 +1,40 @@
 [build-system]
 requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
+
+[tool.poetry]
+name = "jupyter-mining-extension"
+version = "0.0.2"
+description = "Jupyter extension for mining logs"
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.7"
+notebook = "6.1.5"
+
+[tool.poetry.dev-dependencies]
+pytest = "^6.2"
+
+[tool.poetry.scripts]
+jupyter-mining-extension = "jupyter_mining_extension:main"
+
+[tool.poetry.extras]
+dev = ["pytest"]
+
+[tool.setuptools]
+zip_safe = false
+
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.setup]
+name = "jupyter-mining-extension"
+version = "0.0.2"
+description = "Jupyter extension for mining logs"
+long_description = "file: README.md"
+long_description_content_type = "text/markdown"
+license = "MIT"
+packages = ["jupyter_mining_extension"]
+include_package_data = true
+zip_safe = false
