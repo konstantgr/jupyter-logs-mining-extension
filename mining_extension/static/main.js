@@ -43,6 +43,10 @@ define([
             });
     }
 
+    function logEvent(event) {
+        console.log('Event:', event.type, event);
+    }
+
     function saveLogs(time, sessionId, kernelId, notebookName, event, cell, cellNumber) {
         let cellIndex;
         let cellSource;
@@ -139,8 +143,10 @@ define([
             DeleteUpAndDownButtons();
 
             if (Jupyter.notebook) {
+                events.on('all', logEvent);
                 registerEvents();
             } else {
+                events.on('all', logEvent);
                 events.on('notebook_loaded.Notebook', function () {
                     saveCells()
                     registerEvents();
