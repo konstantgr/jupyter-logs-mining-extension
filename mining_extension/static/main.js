@@ -134,7 +134,16 @@ define([
         const notebookName = Jupyter.notebook.notebook_name;
         const sessionId = Jupyter.notebook.session.id
 
-        saveLogs((new Date()).toISOString(), sessionId, kernelId, notebookName, "save_notebook", content, null);
+        const logs = {
+            "time": (new Date()).toISOString(),
+            "kernel_id": kernelId,
+            "notebook_name": notebookName,
+            "event": "save_notebook",
+            "cell_source": content,
+            "session_id": sessionId
+        };
+
+        sendRequest(JSON.stringify(logs));
     }
 
     function loadExtension() {
