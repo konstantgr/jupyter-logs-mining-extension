@@ -4,16 +4,26 @@ build-backend = "setuptools.build_meta"
 
 [tool.poetry]
 name = "jupyter-mining-extension"
-version = "0.0.2"
-description = "Jupyter extension for mining logs"
-license = "MIT"
+version = "0.0.1"
+description = ""
+license = "GPL-3.0-or-later"
+authors = ["Your Name <you@example.com>"]
+classifiers = [
+    "Programming Language :: Python :: 3.7",
+    "Development Status :: 2 - Pre-Alpha",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Operating System :: OS Independent",
+]
 
 [tool.poetry.dependencies]
 python = "^3.7"
-notebook = "6.1.5"
+jupyter = "^1.0"
 
 [tool.poetry.dev-dependencies]
-pytest = "^6.2"
+
+[tool.poetry.scripts]
+
+[tool.poetry.extras]
 
 [tool.poetry.scripts]
 jupyter-mining-extension = "jupyter_mining_extension:main"
