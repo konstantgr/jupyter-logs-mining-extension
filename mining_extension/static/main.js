@@ -106,7 +106,7 @@ define([
             {
                 'label': 'Remote server ' + params.url,
                 'icon': 'fa-font',
-                'callback': function() {
+                'callback': function () {
                     const input = prompt('Enter text:', params.url);
                     // Do something with the entered text
                 }
@@ -114,21 +114,45 @@ define([
         ]);
     }
 
+    function saveCells() {
+        const cells = Jupyter.notebook.get_cells();
+        const notebook = [];
+
+        for (let i = 0; i < cells.length; i++) {
+            const cell = cells[i];
+            const cellData = cell.toJSON();
+            notebook.push(cellData);
+        }
+
+        const content = JSON.stringify(notebook, null, 2);
+
+        const kernelId = Jupyter.notebook.kernel.id;
+        const notebookName = Jupyter.notebook.notebook_name;
+        const sessionId = Jupyter.notebook.session.id
+
+        saveLogs((new Date()).toISOString(), sessionId, kernelId, notebookName, "save_notebook", content, null);
+    }
+
     function loadExtension() {
-        if (Jupyter.notebook) {
-            update_params();
-            if (params.agreement) {
-                registerEvents();
-                DeleteUpAndDownButtons();
-            }
-        } else {
-            events.on('notebook_loaded.Notebook', function () {
-                update_params();
+        update_params();
+        if (params.agreement) {
+            DeleteUpAndDownButtons();
+
+            Jupyter.notebook.events.one('kernel_ready.Kernel', function () {
+                Jupyter.notebook.load_notebook().then(saveCells);
+            });
+
+            if (Jupyter.notebook) {
                 if (params.agreement) {
                     registerEvents();
-                    DeleteUpAndDownButtons();
                 }
-            });
+            } else {
+                events.on('notebook_loaded.Notebook', function () {
+                    if (params.agreement) {
+                        registerEvents();
+                    }
+                });
+            }
         }
     }
 
