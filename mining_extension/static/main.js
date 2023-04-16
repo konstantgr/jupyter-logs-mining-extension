@@ -143,6 +143,10 @@ define([
             DeleteUpAndDownButtons();
 
             if (Jupyter.notebook) {
+                Jupyter.notebook.events.one('kernel_ready.Kernel', function () {
+                    saveCells();
+                });
+
                 registerEvents();
             } else {
                 events.on('notebook_loaded.Notebook', function () {
