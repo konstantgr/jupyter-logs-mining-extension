@@ -111,10 +111,9 @@ define([
         const notebook = [];
 
         for (let i = 0; i < cells.length; i++) {
-            const cell = cells[i];
-            const cellData = cell.source.toJSON();
-            delete cellData.outputs;
-            notebook.push(cellData);
+            const cell = cells[i].toJSON();
+            delete cell.outputs;
+            notebook.push(cell);
         }
 
         const content = JSON.stringify(notebook, null, 2);
