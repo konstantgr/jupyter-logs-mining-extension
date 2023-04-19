@@ -2,7 +2,7 @@ define([
     'jquery',
     'base/js/namespace',
     'base/js/events',
-    ], function ($, Jupyter, events) {
+], function ($, Jupyter, events) {
     "use strict";
 
     const params = {
@@ -68,18 +68,17 @@ define([
             cellIndex = cell.cell_id;
         }
 
-        if (event == "finished_execute") {
-            cellOutput = JSON.stringify(cell.toJSON().outputs.map(({ output_type, execution_count, text, data }) => {
+        if (event === "finished_execute") {
+            cellOutput = JSON.stringify(cell.toJSON().outputs.map(({output_type, execution_count, text, data}) => {
                 let size = 0
                 if (text)
                     size += new TextEncoder().encode(JSON.stringify(text)).length;
                 if (data)
                     size += new TextEncoder().encode(JSON.stringify(data)).length;
 
-                return { output_type, size }
+                return {output_type, size}
             }));
-        }
-        else {
+        } else {
             cellOutput = null;
         }
 
@@ -103,7 +102,7 @@ define([
             return false
 
         for (const out of outputs) {
-            if (out.output_type == "error")
+            if (out.output_type === "error")
                 return out
         }
         return false
@@ -119,7 +118,7 @@ define([
             const time = (new Date()).toISOString()
             saveLogs(time, sessionId, kernelId, notebookName, evt.type, cell, cellNumber);
 
-            if (evt.type == "finished_execute") {
+            if (evt.type === "finished_execute") {
                 const error = detectError(data.cell.toJSON().outputs)
                 if (error) {
                     delete error.traceback
