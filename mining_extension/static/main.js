@@ -6,7 +6,7 @@ define([
     "use strict";
 
     const params = {
-        url: "0.0.0.0",
+        url: "127.0.0.1",
         agreement: false
     };
 
