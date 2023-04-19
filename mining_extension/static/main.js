@@ -1,10 +1,8 @@
-// 'url' : 'http://3.249.245.244:9999/',
-
 define([
     'jquery',
     'base/js/namespace',
     'base/js/events',
-], function ($, Jupyter, events) {
+    ], function ($, Jupyter, events) {
     "use strict";
 
     const params = {
@@ -20,6 +18,7 @@ define([
         'notebook_renamed.Notebook',
         'kernel_interrupting.Kernel',
         'kernel_restarting.Kernel',
+        'finished_execute.CodeCell'
     ];
 
     const update_params = function () {
@@ -60,6 +59,7 @@ define([
     function saveLogs(time, sessionId, kernelId, notebookName, event, cell, cellNumber) {
         let cellIndex;
         let cellSource;
+        let cellOutput
         if (cell === undefined) {
             cellSource = "";
             cellIndex = "";
@@ -67,6 +67,22 @@ define([
             cellSource = cell.get_text();
             cellIndex = cell.cell_id;
         }
+
+        if (event == "finished_execute") {
+            cellOutput = JSON.stringify(cell.toJSON().outputs.map(({ output_type, execution_count, text, data }) => {
+                let size = 0
+                if (text)
+                    size += new TextEncoder().encode(JSON.stringify(text)).length;
+                if (data)
+                    size += new TextEncoder().encode(JSON.stringify(data)).length;
+
+                return { output_type, size }
+            }));
+        }
+        else {
+            cellOutput = null;
+        }
+
         const logs = {
             "time": time,
             "kernel_id": kernelId,
@@ -75,22 +91,51 @@ define([
             "cell_index": cellIndex,
             "cell_num": cellNumber,
             "cell_source": cellSource,
-            "session_id": sessionId
+            "session_id": sessionId,
+            "cell_output": cellOutput
         };
 
         sendRequest(JSON.stringify(logs));
     }
 
-    function registerEvents() {
+    function detectError(outputs) {
+        if (!outputs || !outputs.length)
+            return false
 
+        for (const out of outputs) {
+            if (out.output_type == "error")
+                return out
+        }
+        return false
+    }
+
+    function registerEvents() {
         events.on(tracked_events.join(' '), function (evt, data) {
             const kernelId = Jupyter.notebook.kernel.id;
             const notebookName = Jupyter.notebook.notebook_name;
             const cellNumber = Jupyter.notebook.get_selected_index();
             const cell = data.cell
             const sessionId = Jupyter.notebook.session.id
+            const time = (new Date()).toISOString()
+            saveLogs(time, sessionId, kernelId, notebookName, evt.type, cell, cellNumber);
 
-            saveLogs((new Date()).toISOString(), sessionId, kernelId, notebookName, evt.type, cell, cellNumber);
+            if (evt.type == "finished_execute") {
+                const error = detectError(data.cell.toJSON().outputs)
+                if (error) {
+                    delete error.traceback
+                    const logs = {
+                        "time": time,
+                        "kernel_id": kernelId,
+                        "notebook_name": notebookName,
+                        "event": "error",
+                        "cell_index": cell.cell_id,
+                        "cell_num": cellNumber,
+                        "cell_source": JSON.stringify(error),
+                        "session_id": sessionId
+                    };
+                    sendRequest(JSON.stringify(logs));
+                }
+            }
         });
     }
 
@@ -112,6 +157,7 @@ define([
 
         for (let i = 0; i < cells.length; i++) {
             const cell = cells[i].toJSON();
+            cell.id = cells[i].cell_id;
             delete cell.outputs;
             delete cell.metadata;
 
