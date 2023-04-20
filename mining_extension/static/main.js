@@ -52,10 +52,6 @@ define([
             });
     }
 
-    function logEvent(event) {
-        console.log('Event:', event.type, event);
-    }
-
     function saveLogs(time, sessionId, kernelId, notebookName, event, cell, cellNumber) {
         let cellIndex;
         let cellSource;
@@ -150,6 +146,43 @@ define([
         }
     }
 
+    function CellTypeChangeHandler() {
+        const kernelId = Jupyter.notebook.kernel.id;
+        const notebookName = Jupyter.notebook.notebook_name;
+        const sessionId = Jupyter.notebook.session.id;
+        const cell = Jupyter.notebook.get_selected_cell();
+        const cellNum = Jupyter.notebook.get_selected_index();
+
+        const new_type = $('#cell_type').val();
+        let event;
+        if (new_type === "code") {
+            event = "to_code";
+        } else if (new_type === "markdown") {
+            event = "to_markdown";
+        } else {
+            event = "to_other";
+        }
+
+        console.log('Cell type changed to:', new_type, Jupyter.notebook.get_selected_cell().cell_id);
+
+        const logs = {
+            "time": (new Date()).toISOString(),
+            "kernel_id": kernelId,
+            "notebook_name": notebookName,
+            "cell_index": cell.cell_id,
+            "cell_num": cellNum,
+            "event": event,
+            "cell_source": cell.get_text(),
+            "session_id": sessionId
+        };
+
+        sendRequest(JSON.stringify(logs));
+    }
+
+    function CellTypeComboboxListener() {
+        $('#cell_type').on('change', CellTypeChangeHandler);
+    }
+
     function saveCells() {
         const cells = Jupyter.notebook.get_cells();
         const notebook = [];
@@ -185,6 +218,7 @@ define([
         update_params();
         if (params.agreement) {
             DeleteUpAndDownButtons();
+            CellTypeComboboxListener();
 
             if (Jupyter.notebook) {
                 Jupyter.notebook.events.one('kernel_ready.Kernel', function () {
