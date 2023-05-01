@@ -55,13 +55,16 @@ define([
     function saveLogs(time, sessionId, kernelId, notebookName, event, cell, cellNumber) {
         let cellIndex;
         let cellSource;
-        let cellOutput
+        let cellOutput;
+        let cell_type;
         if (cell === undefined) {
             cellSource = "";
             cellIndex = "";
+            cell_type = "";
         } else {
             cellSource = cell.get_text();
             cellIndex = cell.cell_id;
+            cell_type = cell.cell_type;
         }
 
         if (event === "finished_execute") {
@@ -86,11 +89,15 @@ define([
             "cell_index": cellIndex,
             "cell_num": cellNumber,
             "cell_source": cellSource,
+            "cell_type": cell_type,
             "session_id": sessionId,
             "cell_output": cellOutput
         };
 
         sendRequest(JSON.stringify(logs));
+
+        const logPath = `${kernelId}.log`
+        Jupyter.notebook.kernel.execute(`!echo '${JSON.stringify(logs)}' >> '${logPath}'`);
     }
 
     function detectError(outputs) {
@@ -126,9 +133,13 @@ define([
                         "cell_index": cell.cell_id,
                         "cell_num": cellNumber,
                         "cell_source": JSON.stringify(error),
+                        "cell_type": cell.cell_type,
                         "session_id": sessionId
                     };
                     sendRequest(JSON.stringify(logs));
+
+                    const logPath = `${kernelId}.log`
+                    Jupyter.notebook.kernel.execute(`!echo '${JSON.stringify(logs)}' >> '${logPath}'`);
                 }
             }
         });
@@ -171,12 +182,16 @@ define([
             "notebook_name": notebookName,
             "cell_index": cell.cell_id,
             "cell_num": cellNum,
+            "cell_type": cell.cell_type,
             "event": event,
             "cell_source": cell.get_text(),
             "session_id": sessionId
         };
 
         sendRequest(JSON.stringify(logs));
+
+        const logPath = `${kernelId}.log`
+        Jupyter.notebook.kernel.execute(`!echo '${JSON.stringify(logs)}' >> '${logPath}'`);
     }
 
     function CellTypeComboboxListener() {
@@ -212,6 +227,9 @@ define([
         };
 
         sendRequest(JSON.stringify(logs));
+
+        const logPath = `${kernelId}.log`
+        Jupyter.notebook.kernel.execute(`!echo '${JSON.stringify(logs)}' >> '${logPath}'`);
     }
 
     function loadExtension() {
