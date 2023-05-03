@@ -1,25 +1,40 @@
-define([
-    'jquery',
-    'base/js/namespace',
-    'base/js/events',
-], function ($, Jupyter, events) {
+define(['jquery', 'base/js/namespace', 'base/js/events',], function ($, Jupyter, events) {
     "use strict";
+
+    function executePythonCommand(command) {
+        return new Promise((resolve, reject) => {
+            let output = '';
+            Jupyter.notebook.kernel.execute(command, {
+                iopub: {
+                    output: function (data) {
+                        output = data.content.text.trim();
+                        resolve(output);
+                    }
+                }
+            });
+        });
+    }
+
+    async function getLocalIP() {
+        executePythonCommand(
+            "from mining_extension import get_local_ip; print(get_local_ip())"
+        )
+            .then((output) => {
+                params["local_ip"] = output;
+            })
+            .catch((error) => {
+                console.error("Error:", error);
+            });
+    }
 
     const params = {
         url: "127.0.0.1",
-        agreement: false
+        agreement: false,
+        local_ip: null,
     };
 
-    const tracked_events = [
-        'create.Cell',
-        'delete.Cell',
-        'execute.CodeCell',
-        'rendered.MarkdownCell',
-        'notebook_renamed.Notebook',
-        'kernel_interrupting.Kernel',
-        'kernel_restarting.Kernel',
-        'finished_execute.CodeCell'
-    ];
+
+    const tracked_events = ['create.Cell', 'delete.Cell', 'execute.CodeCell', 'rendered.MarkdownCell', 'notebook_renamed.Notebook', 'kernel_interrupting.Kernel', 'kernel_restarting.Kernel', 'finished_execute.CodeCell'];
 
     const update_params = function () {
         const config = Jupyter.notebook.config;
@@ -32,11 +47,9 @@ define([
 
     function sendRequest(json_data) {
         fetch(params['url'], {
-            method: 'POST',
-            headers: {
+            method: 'POST', headers: {
                 'Content-Type': 'application/json'
-            },
-            body: json_data
+            }, body: json_data
         })
             .then(response => {
                 if (!response.ok) {
@@ -70,10 +83,8 @@ define([
         if (event === "finished_execute") {
             cellOutput = JSON.stringify(cell.toJSON().outputs.map(({output_type, execution_count, text, data}) => {
                 let size = 0
-                if (text)
-                    size += new TextEncoder().encode(JSON.stringify(text)).length;
-                if (data)
-                    size += new TextEncoder().encode(JSON.stringify(data)).length;
+                if (text) size += new TextEncoder().encode(JSON.stringify(text)).length;
+                if (data) size += new TextEncoder().encode(JSON.stringify(data)).length;
 
                 return {output_type, size}
             }));
@@ -82,6 +93,7 @@ define([
         }
 
         const logs = {
+            "ip_address": params["local_ip"],
             "time": time,
             "kernel_id": kernelId,
             "notebook_name": notebookName,
@@ -95,18 +107,13 @@ define([
         };
 
         sendRequest(JSON.stringify(logs));
-
-        const logPath = `${kernelId}.log`
-        Jupyter.notebook.kernel.execute(`!echo '${JSON.stringify(logs)}' >> '${logPath}'`);
     }
 
     function detectError(outputs) {
-        if (!outputs || !outputs.length)
-            return false
+        if (!outputs || !outputs.length) return false
 
         for (const out of outputs) {
-            if (out.output_type === "error")
-                return out
+            if (out.output_type === "error") return out
         }
         return false
     }
@@ -137,9 +144,6 @@ define([
                         "session_id": sessionId
                     };
                     sendRequest(JSON.stringify(logs));
-
-                    const logPath = `${kernelId}.log`
-                    Jupyter.notebook.kernel.execute(`!echo '${JSON.stringify(logs)}' >> '${logPath}'`);
                 }
             }
         });
@@ -177,6 +181,7 @@ define([
         console.log('Cell type changed to:', new_type, Jupyter.notebook.get_selected_cell().cell_id);
 
         const logs = {
+            "ip_address": params["local_ip"],
             "time": (new Date()).toISOString(),
             "kernel_id": kernelId,
             "notebook_name": notebookName,
@@ -190,8 +195,6 @@ define([
 
         sendRequest(JSON.stringify(logs));
 
-        const logPath = `${kernelId}.log`
-        Jupyter.notebook.kernel.execute(`!echo '${JSON.stringify(logs)}' >> '${logPath}'`);
     }
 
     function CellTypeComboboxListener() {
@@ -199,6 +202,8 @@ define([
     }
 
     function saveCells() {
+        getLocalIP();
+
         const cells = Jupyter.notebook.get_cells();
         const notebook = [];
 
@@ -218,6 +223,7 @@ define([
         const sessionId = Jupyter.notebook.session.id
 
         const logs = {
+            "ip_address": params["local_ip"],
             "time": (new Date()).toISOString(),
             "kernel_id": kernelId,
             "notebook_name": notebookName,
@@ -228,8 +234,6 @@ define([
 
         sendRequest(JSON.stringify(logs));
 
-        const logPath = `${kernelId}.log`
-        Jupyter.notebook.kernel.execute(`!echo '${JSON.stringify(logs)}' >> '${logPath}'`);
     }
 
     function loadExtension() {
