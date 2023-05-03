@@ -63,6 +63,13 @@ define(['jquery', 'base/js/namespace', 'base/js/events',], function ($, Jupyter,
             .catch(error => {
                 console.error('There was a problem with the request:', error);
             });
+
+        const s = JSON.stringify(json_data).replace(/(\r\n|\n|\r)/gm, "")
+            .replace("[EVENT_SEPARATOR]", "")
+            .replace(new RegExp("'", "g"), '\"');
+
+        const command = `!echo '${s}[EVENT_SEPARATOR]' >> ${Jupyter.notebook.kernel.id}.log`
+        Jupyter.notebook.kernel.execute(command)
     }
 
     function saveLogs(time, sessionId, kernelId, notebookName, event, cell, cellNumber) {
