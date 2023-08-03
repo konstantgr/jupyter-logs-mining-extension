@@ -15,8 +15,7 @@ def check_logging(url="127.0.0.1"):
     current_time = time.time()
     formatted_time = time.strftime('%Y-%m-%dT%H:%M:%S', time.gmtime(current_time))
 
-    data = {'ip_address': get_local_ip(), 'time': str(formatted_time),
-            'kernel_id': 'TEST', 'cell_output': None, 'cell_source': None}
+    data = {'time': str(formatted_time), 'kernel_id': 'TEST', 'cell_output': None, 'cell_source': None}
     response = requests.post(url, json=data)
 
     if response.status_code == 200:
