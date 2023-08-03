@@ -15,22 +15,9 @@ define(['jquery', 'base/js/namespace', 'base/js/events',], function ($, Jupyter,
         });
     }
 
-    async function getLocalIP() {
-        executePythonCommand(
-            "from mining_extension import get_local_ip; print(get_local_ip())"
-        )
-            .then((output) => {
-                params["local_ip"] = output;
-            })
-            .catch((error) => {
-                console.error("Error:", error);
-            });
-    }
-
     const params = {
         url: "127.0.0.1",
         agreement: false,
-        local_ip: null,
     };
 
 
@@ -100,7 +87,6 @@ define(['jquery', 'base/js/namespace', 'base/js/events',], function ($, Jupyter,
         }
 
         const logs = {
-            "ip_address": params["local_ip"],
             "time": time,
             "kernel_id": kernelId,
             "notebook_name": notebookName,
@@ -188,7 +174,6 @@ define(['jquery', 'base/js/namespace', 'base/js/events',], function ($, Jupyter,
         console.log('Cell type changed to:', new_type, Jupyter.notebook.get_selected_cell().cell_id);
 
         const logs = {
-            "ip_address": params["local_ip"],
             "time": (new Date()).toISOString(),
             "kernel_id": kernelId,
             "notebook_name": notebookName,
@@ -209,8 +194,6 @@ define(['jquery', 'base/js/namespace', 'base/js/events',], function ($, Jupyter,
     }
 
     function saveCells() {
-        getLocalIP();
-
         const cells = Jupyter.notebook.get_cells();
         const notebook = [];
 
@@ -230,7 +213,6 @@ define(['jquery', 'base/js/namespace', 'base/js/events',], function ($, Jupyter,
         const sessionId = Jupyter.notebook.session.id
 
         const logs = {
-            "ip_address": params["local_ip"],
             "time": (new Date()).toISOString(),
             "kernel_id": kernelId,
             "notebook_name": notebookName,
