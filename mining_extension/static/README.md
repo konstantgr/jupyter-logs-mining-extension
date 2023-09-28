@@ -1,28 +1,3 @@
-# Jupyter Logs Mining Extension
-
-# Installation
-
-For using the extension, first you should to install allowed version of `notebook` and
-`jupyter-contrib-nbextensions` packages.
-
-```bash
-pip install notebook==6.4.12
-pip install jupyter-contrib-nbextensions==0.7.0
-```
-
-Then, install the extension, install and enable it
-
-```bash
-pip install git+https://github.com/konstantgr/jupyter-logs-mining-extension.git@python_extension
-jupyter nbextension install --py mining_extension --user
-jupyter nbextension enable --py mining_extension --user 
-```
-
-To start using the extension, check the checkbox in the extension description on the main Jupyter page and configure the
-url of the remote server.
-
-# About
-
 ## Description
 
 This extension mines cell execution logs and designed to provide detailed
